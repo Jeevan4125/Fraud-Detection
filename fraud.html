@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FraudShield Pro - AI Fraud Detection</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --primary: #1a2980;
+      --secondary: #26d0ce;
+      --accent: #ff6b6b;
+      --dark: #0c1226;
+      --light: #f8f9ff;
+      --success: #4ade80;
+      --warning: #f59e0b;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Roboto", sans-serif;
+      background: linear-gradient(135deg, #1a2980, #26d0ce);
+      color: var(--light);
+      min-height: 100vh;
+      padding: 20px;
+      line-height: 1.6;
+      position: relative;
+    }
+
+    .container {
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Header Styles */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 0;
+      margin-bottom: 30px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+
+    header.scrolled {
+      background: rgba(26, 41, 128, 0.85);
+      backdrop-filter: blur(10px);
+      padding: 15px 0;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+      border-bottom: none;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .logo-icon {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      width: 55px;
+      height: 55px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .logo-text {
+      font-family: "Montserrat", sans-serif;
+      font-weight: 700;
+    }
+
+    .logo-text h1 {
+      font-size: 1.8rem;
+      background: linear-gradient(to right, #fff, var(--secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-text p {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.7);
+      margin-top: 3px;
+    }
+
+    nav ul {
+      display: flex;
+      gap: 25px;
+      list-style: none;
+    }
+
+    nav a {
+      color: rgba(255, 255, 255, 0.85);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1.05rem;
+      transition: color 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    nav a:hover {
+      color: var(--secondary);
+    }
+
+    nav a.active {
+      color: var(--secondary);
+      font-weight: 600;
+    }
+
+    /* Hero Section */
+    .hero {
+      display: flex;
+      gap: 40px;
+      margin-bottom: 60px;
+    }
+
+    .hero-content {
+      flex: 1;
+      padding: 30px 0;
+    }
+
+    .hero h2 {
+      font-family: "Montserrat", sans-serif;
+      font-size: 3.2rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      line-height: 1.2;
+    }
+
+    .hero h2 span {
+      background: linear-gradient(to right, var(--secondary), var(--success));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin-bottom: 30px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .stats {
+      display: flex;
+      gap: 30px;
+      margin-top: 40px;
+    }
+
+    .stat-item {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      flex: 1;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .stat-item .number {
+      font-family: "Montserrat", sans-serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+      background: linear-gradient(to right, #fff, var(--secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .stat-item .label {
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .hero-image {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .dashboard-img {
+      width: 100%;
+      max-width: 600px;
+      background: rgba(12, 18, 40, 0.6);
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Main Content - Home Page Graphs */
+    .home-graphs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      margin-bottom: 60px;
+    }
+
+    .graph-card {
+      flex: 1;
+      min-width: 300px;
+      background: rgba(12, 18, 40, 0.6);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 35px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .graph-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    }
+
+    .graph-card h3 {
+      font-family: "Montserrat", sans-serif;
+      font-size: 1.8rem;
+      margin-bottom: 25px;
+      color: var(--secondary);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .graph-card h3 i {
+      font-size: 1.5rem;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 250px;
+      width: 100%;
+    }
+
+    /* Analyze Page */
+    .analyze-page {
+      display: none;
+      padding: 30px 0 60px;
+    }
+
+    .content-container {
+      display: flex;
+      gap: 30px;
+      margin-bottom: 60px;
+    }
+
+    .card {
+      background: rgba(12, 18, 40, 0.6);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 35px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    }
+
+    .card h3 {
+      font-family: "Montserrat", sans-serif;
+      font-size: 1.8rem;
+      margin-bottom: 25px;
+      color: var(--secondary);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .card h3 i {
+      font-size: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 12px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 1.1rem;
+    }
+
+    .file-input-container {
+      position: relative;
+    }
+
+    .file-input-container input {
+      width: 100%;
+      padding: 16px;
+      background: rgba(20, 30, 60, 0.5);
+      border: 2px dashed rgba(100, 200, 255, 0.3);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .file-input-container input:focus {
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 4px rgba(38, 208, 206, 0.2);
+    }
+
+    .file-input-container::after {
+      content: "Browse Files";
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--secondary);
+      color: var(--dark);
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .file-input-container:hover::after {
+      background: #20b8b6;
+    }
+
+    button {
+      width: 100%;
+      padding: 18px;
+      background: linear-gradient(135deg, var(--secondary), #20b8b6);
+      border: none;
+      border-radius: 12px;
+      color: var(--dark);
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 20px rgba(38, 208, 206, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font-family: "Montserrat", sans-serif;
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(38, 208, 206, 0.5);
+    }
+
+    button i {
+      font-size: 1.3rem;
+    }
+
+    .info-box {
+      background: rgba(20, 40, 80, 0.4);
+      border-left: 4px solid var(--secondary);
+      padding: 20px;
+      border-radius: 0 12px 12px 0;
+      margin-top: 30px;
+    }
+
+    .info-box h4 {
+      font-size: 1.3rem;
+      margin-bottom: 15px;
+      color: var(--secondary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .info-box ul {
+      padding-left: 20px;
+    }
+
+    .info-box li {
+      margin-bottom: 10px;
+      position: relative;
+      padding-left: 25px;
+    }
+
+    .info-box li:before {
+      content: "•";
+      color: var(--secondary);
+      font-size: 1.5rem;
+      position: absolute;
+      left: 0;
+      top: -5px;
+    }
+
+    /* Results Section */
+    .results-content {
+      background: rgba(20, 30, 60, 0.5);
+      border-radius: 15px;
+      padding: 30px;
+      min-height: 350px;
+      display: flex;
+      flex-direction: column;
+      border: 1px dashed rgba(100, 200, 255, 0.2);
+    }
+
+    .progress-container {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      height: 12px;
+      margin: 20px 0;
+      overflow: hidden;
+      display: none;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--secondary), var(--primary));
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    /* Download Page */
+    .download-page {
+      display: none;
+      padding: 30px 0 60px;
+      text-align: center;
+    }
+
+    .download-card {
+      max-width: 600px;
+      margin: 0 auto;
+      background: rgba(12, 18, 40, 0.6);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 50px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .download-icon {
+      font-size: 5rem;
+      color: var(--secondary);
+      margin-bottom: 25px;
+    }
+
+    .download-card h2 {
+      font-family: "Montserrat", sans-serif;
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      color: var(--secondary);
+    }
+
+    .download-card p {
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+      color: rgba(255, 255, 255, 0.9);
+      line-height: 1.7;
+    }
+
+    /* How It Works Section */
+    .detection-details {
+      background: rgba(12, 18, 40, 0.6);
+      border-radius: 20px;
+      padding: 40px;
+      margin-bottom: 60px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .detection-details h3 {
+      text-align: center;
+      font-family: "Montserrat", sans-serif;
+      font-size: 2.2rem;
+      margin-bottom: 50px;
+      color: var(--secondary);
+    }
+
+    .detection-steps {
+      display: flex;
+      gap: 30px;
+    }
+
+    .step-card {
+      background: rgba(20, 30, 60, 0.5);
+      border-radius: 15px;
+      padding: 30px;
+      flex: 1;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .step-card:hover {
+      transform: translateY(-10px);
+    }
+
+    .step-icon {
+      width: 80px;
+      height: 80px;
+      background: rgba(38, 208, 206, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 25px;
+      font-size: 2rem;
+      color: var(--secondary);
+      border: 2px solid var(--secondary);
+    }
+
+    .step-card h4 {
+      font-family: "Montserrat", sans-serif;
+      font-size: 1.4rem;
+      margin-bottom: 15px;
+      color: #fff;
+    }
+
+    .step-card p {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* Features Section */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+      margin-bottom: 60px;
+    }
+
+    .feature-card {
+      background: rgba(12, 18, 40, 0.6);
+      border-radius: 15px;
+      padding: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      gap: 20px;
+      transition: transform 0.3s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .feature-icon {
+      min-width: 60px;
+      height: 60px;
+      background: rgba(38, 208, 206, 0.1);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      color: var(--secondary);
+    }
+
+    .feature-content h4 {
+      font-family: "Montserrat", sans-serif;
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    .feature-content p {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* Footer */
+    footer {
+      background: rgba(10, 15, 30, 0.8);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      margin-top: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 30px;
+      text-align: left;
+    }
+
+    .footer-section {
+      flex: 1;
+    }
+
+    .footer-section h4 {
+      font-family: "Montserrat", sans-serif;
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+      color: var(--secondary);
+    }
+
+    .footer-section p {
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 15px;
+      max-width: 300px;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .social-links a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      color: #fff;
+      font-size: 1.2rem;
+      transition: all 0.3s ease;
+    }
+
+    .social-links a:hover {
+      background: var(--secondary);
+      color: var(--dark);
+      transform: translateY(-3px);
+    }
+
+    .copyright {
+      padding-top: 25px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    /* Login Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(5px);
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, #1a2980, #26d0ce);
+      width: 100%;
+      max-width: 450px;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 1.8rem;
+      color: rgba(255, 255, 255, 0.7);
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+
+    .close-modal:hover {
+      color: #fff;
+    }
+
+    .modal h3 {
+      text-align: center;
+      font-family: "Montserrat", sans-serif;
+      font-size: 2rem;
+      margin-bottom: 30px;
+      color: #fff;
+    }
+
+    .form-group-modal {
+      margin-bottom: 25px;
+    }
+
+    .form-group-modal label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .form-group-modal input {
+      width: 100%;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .form-group-modal input:focus {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: #fff;
+    }
+
+    .login-btn {
+      background: linear-gradient(135deg, #4ade80, #20b8b6);
+      margin-top: 20px;
+    }
+
+    .login-btn:hover {
+      box-shadow: 0 8px 25px rgba(74, 222, 128, 0.5);
+    }
+
+    .forgot-password {
+      text-align: center;
+      margin-top: 20px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .forgot-password a {
+      color: #fff;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .forgot-password a:hover {
+      color: var(--secondary);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1100px) {
+      .hero {
+        flex-direction: column;
+      }
+
+      .detection-steps {
+        flex-direction: column;
+      }
+
+      .footer-content {
+        flex-direction: column;
+        gap: 30px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      nav ul {
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+     
+      .content-container {
+        flex-direction: column;
+      }
+     
+      .home-graphs {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Login Modal -->
+  <div class="modal" id="loginModal">
+    <div class="modal-content">
+      <span class="close-modal" id="closeModal">×</span>
+      <h3><i class="fas fa-lock"></i> Secure Login</h3>
+      <form id="loginForm">
+        <div class="form-group-modal">
+          <label for="email">Email Address</label>
+          <input
+            type="email"
+            id="email"
+            placeholder="your.email@example.com"
+            required
+          />
+        </div>
+        <div class="form-group-modal">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            placeholder="Enter your password"
+            required
+          />
+        </div>
+        <button type="submit" class="login-btn">
+          <i class="fas fa-sign-in-alt"></i> Login & Download Report
+        </button>
+      </form>
+      <div class="forgot-password">
+        <a href="#">Forgot your password?</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Header -->
+    <header id="mainHeader">
+      <div class="logo">
+        <div class="logo-icon">
+          <i class="fas fa-shield-alt"></i>
+        </div>
+        <div class="logo-text">
+          <h1>FraudShield Pro</h1>
+          <p>Advanced AI Fraud Detection System</p>
+        </div>
+      </div>
+      <nav>
+        <ul>
+          <li>
+            <a href="#home" id="homeLink" class="active"><i class="fas fa-home"></i> Home</a>
+          </li>
+          <li>
+            <a href="#analyze" id="analyzeLink"><i class="fas fa-search"></i> Analyze</a>
+          </li>
+          <li>
+            <a href="#how-it-works" id="howItWorksLink"><i class="fas fa-cogs"></i> How It Works</a>
+          </li>
+          <li>
+            <a href="#contact" id="contactLink"><i class="fas fa-envelope"></i> Contact</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <!-- Home Page -->
+    <section id="home">
+      <!-- Hero Section -->
+      <section class="hero">
+        <div class="hero-content">
+          <h2>Detect Financial Fraud with <span>AI-Powered Precision</span></h2>
+          <p>
+            Our advanced machine learning algorithms analyze transaction
+            patterns in real-time to identify and prevent fraudulent activities
+            before they impact your business. Secure your financial operations
+            with industry-leading accuracy.
+          </p>
+
+          <div class="stats">
+            <div class="stat-item">
+              <div class="number">99.7%</div>
+              <div class="label">Detection Accuracy</div>
+            </div>
+            <div class="stat-item">
+              <div class="number">50ms</div>
+              <div class="label">Average Processing</div>
+            </div>
+            <div class="stat-item">
+              <div class="number">24/7</div>
+              <div class="label">Real-time Monitoring</div>
+            </div>
+          </div>
+        </div>
+        <div class="hero-image">
+          <div class="dashboard-img">
+            <div
+              style="
+                background: linear-gradient(45deg, #1a2980, #26d0ce);
+                width: 100%;
+                height: 393px;
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              "
+            >
+              <div style="text-align: center; color: white">
+                <i
+                  class="fas fa-chart-line"
+                  style="font-size: 120px; opacity: 0.3"
+                ></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Home Page Graphs -->
+      <div class="home-graphs">
+        <div class="graph-card">
+          <h3><i class="fas fa-chart-pie"></i> Fraud Distribution</h3>
+          <div class="chart-container">
+            <canvas id="homePieChart"></canvas>
+          </div>
+        </div>
+       
+        <div class="graph-card">
+          <h3><i class="fas fa-chart-bar"></i> Fraud by Amount</h3>
+          <div class="chart-container">
+            <canvas id="homeBarChart"></canvas>
+          </div>
+        </div>
+       
+        <div class="graph-card">
+          <h3><i class="fas fa-chart-area"></i> Risk Score Distribution</h3>
+          <div class="chart-container">
+            <canvas id="homeCircleChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Analyze Page -->
+    <section id="analyze" class="analyze-page">
+      <div class="content-container">
+        <div class="card form-container">
+          <h3><i class="fas fa-file-upload"></i> Upload Transaction Data</h3>
+
+          <form id="uploadForm">
+            <div class="form-group">
+              <label for="dataset"
+                >Select CSV file containing transaction records:</label
+              >
+              <div class="file-input-container">
+                <input
+                  type="file"
+                  name="dataset"
+                  id="dataset"
+                  accept=".csv"
+                  required
+                />
+              </div>
+            </div>
+
+            <button type="submit">
+              <i class="fas fa-search"></i> Detect Fraud Patterns
+            </button>
+          </form>
+
+          <div class="info-box">
+            <h4><i class="fas fa-info-circle"></i> CSV Requirements:</h4>
+            <ul>
+              <li>Must include a header row</li>
+              <li>
+                Required columns: 'TransactionID', 'TransactionDate',
+                'TransactionAmount', 'MerchantID'
+              </li>
+              <li>Amount column should be numeric (e.g., 125.50)</li>
+              <li>Maximum file size: 150MB</li>
+              <li>Data is encrypted during processing</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card results-container">
+          <h3><i class="fas fa-chart-line"></i> Analysis Progress</h3>
+
+          <div class="results-content">
+            <div class="progress-container" id="progress-container">
+              <div class="progress-bar" id="progress-bar"></div>
+            </div>
+           
+            <div id="analyze-placeholder" style="text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+              <i class="fas fa-cloud-upload-alt" style="font-size: 5rem; color: rgba(100, 200, 255, 0.2); margin-bottom: 25px;"></i>
+              <p class="results-text" style="max-width: 500px;">
+                Upload a transaction dataset to begin analysis. Our AI-powered
+                system will scan for suspicious patterns and potential fraud
+                indicators using advanced machine learning algorithms.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Download Page -->
+    <section id="download" class="download-page">
+      <div class="download-card">
+        <i class="fas fa-file-pdf download-icon"></i>
+        <h2>Fraud Analysis Report</h2>
+        <p>Your fraud detection report is ready for download. Please click the button below to download the comprehensive PDF report containing all analysis results and insights.</p>
+        <button id="downloadReportBtn" style="width: auto; padding: 15px 30px;">
+          <i class="fas fa-download"></i> Download Full Report
+        </button>
+        <p style="margin-top: 20px; font-size: 0.9rem; color: rgba(255, 255, 255, 0.7);">
+          Report includes fraud distribution charts, risk analysis, and detailed transaction insights.
+        </p>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="detection-details" id="how-it-works">
+      <h3>How Our Fraud Detection System Works</h3>
+      <div class="detection-steps">
+        <div class="step-card">
+          <div class="step-icon">
+            <i class="fas fa-database"></i>
+          </div>
+          <h4>Data Collection</h4>
+          <p>
+            Our system ingests transaction data from multiple sources,
+            including payment gateways, banking systems, and e-commerce
+            platforms.
+          </p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-icon">
+            <i class="fas fa-brain"></i>
+          </div>
+          <h4>AI Analysis</h4>
+          <p>
+            Advanced machine learning models analyze transaction patterns,
+            user behavior, and historical data to identify anomalies.
+          </p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-icon">
+            <i class="fas fa-robot"></i>
+          </div>
+          <h4>Pattern Recognition</h4>
+          <p>
+            Our neural networks detect complex fraud patterns that traditional
+            systems miss, including subtle behavioral changes.
+          </p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-icon">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <h4>Real-time Prevention</h4>
+          <p>
+            Suspicious transactions are flagged in real-time, allowing
+            immediate action to prevent financial loss.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Key Features -->
+    <h3
+      style="
+        font-family: 'Montserrat', sans-serif;
+        font-size: 2.2rem;
+        margin-bottom: 30px;
+        color: var(--secondary);
+        text-align: center;
+      "
+    >
+      Key Features & Technologies
+    </h3>
+    <div class="features">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-bolt"></i>
+        </div>
+        <div class="feature-content">
+          <h4>Real-time Analysis</h4>
+          <p>
+            Process transactions in milliseconds with our high-performance
+            engine, preventing fraud before it impacts your accounts.
+          </p>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-user-shield"></i>
+        </div>
+        <div class="feature-content">
+          <h4>Behavioral Biometrics</h4>
+          <p>
+            Analyze user interaction patterns to detect account takeovers and
+            identity theft with 98% accuracy.
+          </p>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-network-wired"></i>
+        </div>
+        <div class="feature-content">
+          <h4>Network Analysis</h4>
+          <p>
+            Detect organized fraud rings by analyzing connections between
+            accounts, devices, and transactions.
+          </p>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-robot"></i>
+        </div>
+        <div class="feature-content">
+          <h4>Adaptive AI Models</h4>
+          <p>
+            Our self-learning models continuously improve as they process more
+            data and encounter new fraud patterns.
+          </p>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-lock"></i>
+        </div>
+        <div class="feature-content">
+          <h4>Military-grade Encryption</h4>
+          <p>
+            All data is protected with AES-256 encryption during processing
+            and never stored on our servers.
+          </p>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-chart-pie"></i>
+        </div>
+        <div class="feature-content">
+          <h4>Comprehensive Reporting</h4>
+          <p>
+            Detailed analytics and visual reports to understand fraud patterns
+            and improve your security strategy.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer id="contact">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h4>SecureAI Shield</h4>
+          <p>
+            Advanced fraud detection for financial institutions, e-commerce
+            platforms, and payment processors.
+          </p>
+          <div class="social-links">
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+            <a href="#"><i class="fab fa-github"></i></a>
+            <a href="#"><i class="fab fa-facebook"></i></a>
+          </div>
+        </div>
+
+        <div class="footer-section">
+          <h4>Contact Us</h4>
+          <p><i class="fas fa-map-marker-alt"></i> Chennai, Tamilnadu</p>
+          <p><i class="fas fa-phone"></i> +91 6381274862</p>
+          <p><i class="fas fa-phone"></i> +91 8122544643</p>
+          <p><i class="fas fa-envelope"></i> asilansari08@gmail.com</p>
+          <p><i class="fas fa-envelope"></i> sjeevankumar12@gmail.com</p>
+        </div>
+
+        <div class="footer-section">
+          <h4>Certifications</h4>
+          <p><i class="fas fa-shield-alt"></i> ISO 27001 Certified</p>
+          <p><i class="fas fa-lock"></i> PCI DSS Level 1 Compliant</p>
+          <p><i class="fas fa-globe"></i> GDPR Compliant</p>
+        </div>
+      </div>
+
+      <div class="copyright">
+        <p>
+          © 2023 SecureAI Financial Shield. All rights reserved. Protecting
+          financial systems worldwide.
+        </p>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Initialize charts with sample data
+    function initHomeCharts() {
+      // Pie Chart
+      const pieCtx = document.getElementById('homePieChart').getContext('2d');
+      new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+          labels: ["Legitimate", "Suspicious", "Fraudulent"],
+          datasets: [{
+            data: [75, 15, 10],
+            backgroundColor: [
+              'rgba(74, 222, 128, 0.7)',
+              'rgba(245, 158, 11, 0.7)',
+              'rgba(255, 107, 107, 0.7)'
+            ],
+            borderColor: ['#4ade80', '#f59e0b', '#ff6b6b'],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { color: 'rgba(255, 255, 255, 0.8)' }
+            }
+          }
+        }
+      });
+
+      // Bar Chart
+      const barCtx = document.getElementById('homeBarChart').getContext('2d');
+      new Chart(barCtx, {
+        type: 'bar',
+        data: {
+          labels: ["Low Risk", "Medium Risk", "High Risk"],
+          datasets: [{
+            label: 'Transaction Count',
+            data: [320, 150, 80],
+            backgroundColor: [
+              'rgba(74, 222, 128, 0.7)',
+              'rgba(245, 158, 11, 0.7)',
+              'rgba(255, 107, 107, 0.7)'
+            ],
+            borderColor: ['#4ade80', '#f59e0b', '#ff6b6b'],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(255,255,255,0.1)' },
+              ticks: { color: 'rgba(255,255,255,0.7)' }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: 'rgba(255,255,255,0.7)' }
+            }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
+
+      // Radar Chart
+      const circleCtx = document.getElementById('homeCircleChart').getContext('2d');
+      new Chart(circleCtx, {
+        type: 'radar',
+        data: {
+          labels: ["Amount", "Login Attempts", "Channel", "Frequency", "Time of Day", "Balance"],
+          datasets: [{
+            label: 'Risk Factors',
+            data: [85, 90, 60, 70, 55, 75],
+            backgroundColor: 'rgba(38, 208, 206, 0.2)',
+            borderColor: '#26d0ce',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            r: {
+              angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+              grid: { color: 'rgba(255, 255, 255, 0.1)' },
+              pointLabels: { color: 'rgba(255, 255, 255, 0.8)' },
+              ticks: { display: false }
+            }
+          },
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { color: 'rgba(255, 255, 255, 0.8)' }
+            }
+          }
+        }
+      });
+    }
+
+    // Navigation
+    function setupNavigation() {
+      const navLinks = document.querySelectorAll('nav a');
+     
+      navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+         
+          // Update active class
+          navLinks.forEach(l => l.classList.remove('active'));
+          this.classList.add('active');
+         
+          // Show the correct section
+          const targetId = this.getAttribute('href').substring(1);
+         
+          if(targetId === 'home') {
+            document.getElementById('home').style.display = 'block';
+            document.getElementById('analyze').style.display = 'none';
+            document.getElementById('download').style.display = 'none';
+          }
+          else if(targetId === 'analyze') {
+            document.getElementById('home').style.display = 'none';
+            document.getElementById('analyze').style.display = 'block';
+            document.getElementById('download').style.display = 'none';
+          }
+          else {
+            document.getElementById('home').style.display = 'block';
+            document.getElementById('analyze').style.display = 'none';
+            document.getElementById('download').style.display = 'none';
+           
+            // Scroll to target
+            const targetElement = document.getElementById(targetId);
+            if(targetElement) {
+              targetElement.scrollIntoView({ behavior: 'smooth' });
+            }
+          }
+        });
+      });
+    }
+
+    // File upload and analysis
+    function setupAnalysis() {
+      const uploadForm = document.getElementById('uploadForm');
+      const datasetInput = document.getElementById('dataset');
+      const analyzePlaceholder = document.getElementById('analyze-placeholder');
+     
+      datasetInput.addEventListener('change', function() {
+        if(this.files.length > 0) {
+          analyzePlaceholder.innerHTML = `
+            <i class="fas fa-file-alt" style="font-size: 5rem; color: rgba(100, 200, 255, 0.2); margin-bottom: 25px;"></i>
+            <p class="results-text" style="max-width: 500px;">
+              <strong>Ready to analyze:</strong> ${this.files[0].name}<br>
+              Click "Detect Fraud Patterns" to begin.
+            </p>
+          `;
+        }
+      });
+     
+      uploadForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+       
+        if(datasetInput.files.length === 0) {
+          alert('Please select a CSV file to analyze.');
+          return;
+        }
+       
+        const file = datasetInput.files[0];
+        const fileSizeInMB = file.size / 1024 / 1024;
+        const maxSizeInMB = 150;
+       
+        if(fileSizeInMB > maxSizeInMB) {
+          alert(`File is too large (${fileSizeInMB.toFixed(2)}MB). Please select a file smaller than ${maxSizeInMB}MB.`);
+          return;
+        }
+       
+        // Show progress bar
+        const progressContainer = document.getElementById('progress-container');
+        const progressBar = document.getElementById('progress-bar');
+        progressContainer.style.display = 'block';
+        progressBar.style.width = '0%';
+       
+        // Simulate analysis progress
+        let progress = 0;
+        const interval = setInterval(() => {
+          progress += Math.random() * 5;
+          if(progress >= 100) {
+            progress = 100;
+            clearInterval(interval);
+           
+            // Show download page after analysis
+            document.getElementById('analyze').style.display = 'none';
+            document.getElementById('download').style.display = 'block';
+           
+            // Update active navigation
+            document.querySelectorAll('nav a').forEach(l => l.classList.remove('active'));
+          }
+          progressBar.style.width = `${progress}%`;
+        }, 100);
+      });
+    }
+
+    // PDF download
+    function setupPDFDownload() {
+      const downloadBtn = document.getElementById('downloadReportBtn');
+      const modal = document.getElementById('loginModal');
+      const closeModal = document.getElementById('closeModal');
+      const loginForm = document.getElementById('loginForm');
+     
+      downloadBtn.addEventListener('click', function() {
+        modal.style.display = 'flex';
+      });
+     
+      closeModal.addEventListener('click', function() {
+        modal.style.display = 'none';
+      });
+     
+      window.addEventListener('click', function(e) {
+        if(e.target === modal) modal.style.display = 'none';
+      });
+     
+      loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        generatePDFReport();
+        modal.style.display = 'none';
+      });
+    }
+   
+    function generatePDFReport() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+     
+      doc.setFontSize(22);
+      doc.text('SecureAI Fraud Detection Report', 105, 20, { align: 'center' });
+      doc.setFontSize(12);
+      doc.text(`Generated on: ${new Date().toLocaleString()}`, 105, 28, { align: 'center' });
+      doc.setLineWidth(0.5);
+      doc.line(20, 35, 190, 35);
+     
+      doc.setFontSize(18);
+      doc.text('Analysis Summary', 20, 45);
+      doc.setFontSize(12);
+      doc.text('Legitimate Transactions: 75%', 25, 55);
+      doc.text('Suspicious Transactions: 15%', 25, 62);
+      doc.text('Fraudulent Transactions: 10%', 25, 69);
+     
+      doc.addPage();
+      doc.setFontSize(18);
+      doc.text('Detailed Findings', 20, 20);
+     
+      const tableColumn = ['ID', 'Date', 'Amount', 'Merchant', 'Status', 'Risk Score'];
+      const tableRows = [
+        ['TX1001', '2023-07-01', '$125.50', 'Amazon', 'Legitimate', '12'],
+        ['TX1002', '2023-07-02', '$1,250.00', 'BestBuy', 'Suspicious', '68'],
+        ['TX1003', '2023-07-03', '$2,850.00', 'Unknown', 'Fraud', '92'],
+        ['TX1004', '2023-07-04', '$45.99', 'Netflix', 'Legitimate', '8'],
+        ['TX1005', '2023-07-05', '$650.00', 'Apple', 'Suspicious', '58']
+      ];
+     
+      doc.autoTable({
+        head: [tableColumn],
+        body: tableRows,
+        startY: 30,
+        theme: 'striped',
+        headStyles: { fillColor: [26, 41, 128] }
+      });
+     
+      doc.save('SecureAI_Fraud_Report.pdf');
+      alert('Fraud Detection Report.pdf has been downloaded successfully!');
+    }
+
+    // Initialize everything
+    document.addEventListener('DOMContentLoaded', function() {
+      initHomeCharts();
+      setupNavigation();
+      setupAnalysis();
+      setupPDFDownload();
+     
+      // Header scroll effect
+      window.addEventListener('scroll', () => {
+        document.getElementById('mainHeader').classList.toggle('scrolled', window.scrollY > 50);
+      });
+    });
+  </script>
+  <script src="https://unpkg.com/jspdf-autotable@3.5.23/dist/jspdf.plugin.autotable.js"></script>
+</body>
+</html>
